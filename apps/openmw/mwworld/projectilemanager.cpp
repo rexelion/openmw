@@ -320,6 +320,8 @@ namespace MWWorld
             mesh = "meshes\\w\\magic_target.nif";
         }
 
+        mPhysics->addObject(ptr, mesh, MWPhysics::CollisionType_Projectile);
+
         MWBase::SoundManager *sndMgr = MWBase::Environment::get().getSoundManager();
         for (size_t it = 0; it != state.mSoundIds.size(); it++)
         {

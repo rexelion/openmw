@@ -2,6 +2,8 @@
 
 #include <stdexcept>
 #include <string>
+#include <memory>
+#include <iostream>
 
 #include <BulletCollision/CollisionShapes/btBoxShape.h>
 #include <BulletCollision/CollisionShapes/btTriangleMesh.h>
@@ -80,6 +82,24 @@ btCollisionShape* BulletShape::duplicateCollisionShape(const btCollisionShape *s
 btCollisionShape *BulletShape::getCollisionShape()
 {
     return mCollisionShape;
+}
+
+btCollisionShape *BulletShape::getBBox()
+{
+    std::unique_ptr<btCompoundShape> compound(new btCompoundShape);
+
+    btBoxShape* boxShape = new btBoxShape(btVector3(mCollisionBoxHalfExtents.x(), mCollisionBoxHalfExtents.y(), mCollisionBoxHalfExtents.z()));
+    btTransform transform = btTransform::getIdentity();
+    transform.setOrigin(btVector3(mCollisionBoxTranslate.x(), mCollisionBoxTranslate.y(), mCollisionBoxTranslate.z()));
+    compound->addChildShape(transform, boxShape);
+
+    return compound.release();
+}
+
+void BulletShape::setBBoxAsCollisionShape()
+{
+    std::cout << "SetBBox" << std::endl;
+    mCollisionShape = BulletShape::getBBox();
 }
 
 osg::ref_ptr<BulletShapeInstance> BulletShape::makeInstance() const

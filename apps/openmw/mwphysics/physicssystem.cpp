@@ -559,16 +559,20 @@ namespace MWPhysics
             , mSolid(true)
         {
             mPtr = ptr;
-
+            std::cout << "loading" << std::endl;
             mCollisionObject.reset(new btCollisionObject);
             mCollisionObject->setCollisionShape(shapeInstance->getCollisionShape());
-
+            std::cout << "After setCollisionShape" << std::endl;
             mCollisionObject->setUserPointer(static_cast<PtrHolder*>(this));
-
+            std::cout << "setScale" << std::endl;
             setScale(ptr.getCellRef().getScale());
+            std::cout << "setRotation" << std::endl;
             setRotation(toBullet(ptr.getRefData().getBaseNode()->getAttitude()));
+            std::cout << "setPos" << std::endl;
             const float* pos = ptr.getRefData().getPosition().pos;
+            std::cout << "setOrigin" << std::endl;
             setOrigin(btVector3(pos[0], pos[1], pos[2]));
+            std::cout << "End object constructor" << std::endl;
         }
 
         const Resource::BulletShapeInstance* getShapeInstance() const
@@ -1161,9 +1165,18 @@ namespace MWPhysics
 
     void PhysicsSystem::addObject (const MWWorld::Ptr& ptr, const std::string& mesh, int collisionType)
     {
+        std::cout << mesh << std::endl;
         osg::ref_ptr<Resource::BulletShapeInstance> shapeInstance = mShapeManager->getInstance(mesh);
-        if (!shapeInstance || !shapeInstance->getCollisionShape())
-            return;
+        if (collisionType && CollisionType_Projectile)
+        {
+            shapeInstance->setBBoxAsCollisionShape();
+        }
+        else
+        {
+            if (!shapeInstance || !shapeInstance->getCollisionShape())
+                return;
+        }
+        std::cout << "addObject, after check" << std::endl;
 
         Object *obj = new Object(ptr, shapeInstance);
         mObjects.insert(std::make_pair(ptr, obj));

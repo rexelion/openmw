@@ -44,6 +44,10 @@ namespace Resource
 
         btCollisionShape* getCollisionShape();
 
+        btCollisionShape* getBBox();
+
+        void setBBoxAsCollisionShape();
+
     private:
 
         void deleteShape(btCollisionShape* shape);
