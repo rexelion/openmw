@@ -54,7 +54,7 @@ endif()
 message(STATUS "Configuring OpenMW...")
 
 set(OPENMW_VERSION_MAJOR 0)
-set(OPENMW_VERSION_MINOR 42)
+set(OPENMW_VERSION_MINOR 43)
 set(OPENMW_VERSION_RELEASE 0)
 
 set(OPENMW_VERSION_COMMITHASH "")
@@ -328,6 +328,12 @@ copy_resource_file(${OpenMW_SOURCE_DIR}/files/opencs/defaultfilters
 configure_resource_file(${OpenMW_SOURCE_DIR}/files/gamecontrollerdb.txt
     "${OpenMW_BINARY_DIR}" "gamecontrollerdb.txt")
 
+configure_resource_file(${OpenMW_SOURCE_DIR}/files/gamecontrollerdb_204.txt
+        "${OpenMW_BINARY_DIR}" "gamecontrollerdb_204.txt")
+
+configure_resource_file(${OpenMW_SOURCE_DIR}/files/gamecontrollerdb_205.txt
+        "${OpenMW_BINARY_DIR}" "gamecontrollerdb_205.txt")
+
 if (NOT WIN32 AND NOT APPLE)
     configure_file(${OpenMW_SOURCE_DIR}/files/openmw.desktop
         "${OpenMW_BINARY_DIR}/openmw.desktop")
@@ -338,6 +344,7 @@ if (NOT WIN32 AND NOT APPLE)
 endif()
 
 # CXX Compiler settings
+set(CMAKE_CXX_STANDARD 11)
 if (CMAKE_CXX_COMPILER_ID STREQUAL GNU OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wundef -Wno-unused-parameter -std=c++11 -pedantic -Wno-long-long")
     add_definitions( -DBOOST_NO_CXX11_SCOPED_ENUMS=ON )
@@ -420,6 +427,8 @@ IF(NOT WIN32 AND NOT APPLE)
     INSTALL(FILES "${OpenMW_BINARY_DIR}/openmw.cfg.install" DESTINATION "${SYSCONFDIR}" RENAME "openmw.cfg" COMPONENT "openmw")
     INSTALL(FILES "${OpenMW_BINARY_DIR}/resources/version" DESTINATION "${SYSCONFDIR}" COMPONENT "openmw")
     INSTALL(FILES "${OpenMW_BINARY_DIR}/gamecontrollerdb.txt" DESTINATION "${SYSCONFDIR}" COMPONENT "openmw")
+    INSTALL(FILES "${OpenMW_BINARY_DIR}/gamecontrollerdb_204.txt" DESTINATION "${SYSCONFDIR}" COMPONENT "openmw")
+    INSTALL(FILES "${OpenMW_BINARY_DIR}/gamecontrollerdb_205.txt" DESTINATION "${SYSCONFDIR}" COMPONENT "openmw")
 
     IF(BUILD_OPENCS)
         INSTALL(FILES "${OpenMW_BINARY_DIR}/openmw-cs.cfg" DESTINATION "${SYSCONFDIR}" COMPONENT "opencs")
@@ -435,15 +444,22 @@ if(WIN32)
     FILE(GLOB dll_files_release "${OpenMW_BINARY_DIR}/Release/*.dll")
     INSTALL(FILES ${dll_files_debug} DESTINATION "." CONFIGURATIONS Debug)
     INSTALL(FILES ${dll_files_release} DESTINATION "." CONFIGURATIONS Release;RelWithDebInfo;MinSizeRel)
-    INSTALL(FILES "${OpenMW_BINARY_DIR}/openmw.cfg.install" DESTINATION "." RENAME "openmw.cfg")
+    INSTALL(FILES "${OpenMW_BINARY_DIR}/Debug/openmw.cfg.install" DESTINATION "." RENAME "openmw.cfg" CONFIGURATIONS Debug)
+    INSTALL(FILES "${OpenMW_BINARY_DIR}/Release/openmw.cfg.install" DESTINATION "." RENAME "openmw.cfg" CONFIGURATIONS Release;RelWithDebInfo;MinSizeRel)
     INSTALL(FILES "${OpenMW_SOURCE_DIR}/CHANGELOG.md" DESTINATION "." RENAME "CHANGELOG.txt")
     INSTALL(FILES "${OpenMW_SOURCE_DIR}/README.md" DESTINATION "." RENAME "README.txt")
     INSTALL(FILES "${OpenMW_SOURCE_DIR}/LICENSE" DESTINATION "." RENAME "LICENSE.txt")
     INSTALL(FILES
         "${OpenMW_SOURCE_DIR}/files/mygui/DejaVu Font License.txt"
-        "${OpenMW_BINARY_DIR}/settings-default.cfg"
-        "${OpenMW_BINARY_DIR}/gamecontrollerdb.txt"
         DESTINATION ".")
+    INSTALL(FILES "${OpenMW_BINARY_DIR}/Debug/settings-default.cfg" DESTINATION "." CONFIGURATIONS Debug)
+    INSTALL(FILES "${OpenMW_BINARY_DIR}/Release/settings-default.cfg" DESTINATION "." CONFIGURATIONS Release;RelWithDebInfo;MinSizeRel)
+    INSTALL(FILES "${OpenMW_BINARY_DIR}/Debug/gamecontrollerdb.txt" DESTINATION "." CONFIGURATIONS Debug)
+    INSTALL(FILES "${OpenMW_BINARY_DIR}/Release/gamecontrollerdb.txt" DESTINATION "." CONFIGURATIONS Release;RelWithDebInfo;MinSizeRel)
+    INSTALL(FILES "${OpenMW_BINARY_DIR}/Debug/gamecontrollerdb_204.txt" DESTINATION "." CONFIGURATIONS Debug)
+    INSTALL(FILES "${OpenMW_BINARY_DIR}/Release/gamecontrollerdb_204.txt" DESTINATION "." CONFIGURATIONS Release;RelWithDebInfo;MinSizeRel)
+    INSTALL(FILES "${OpenMW_BINARY_DIR}/Debug/gamecontrollerdb_205.txt" DESTINATION "." CONFIGURATIONS Debug)
+    INSTALL(FILES "${OpenMW_BINARY_DIR}/Release/gamecontrollerdb_205.txt" DESTINATION "." CONFIGURATIONS Release;RelWithDebInfo;MinSizeRel)
 
     if(BUILD_MYGUI_PLUGIN)
         INSTALL(PROGRAMS "${OpenMW_BINARY_DIR}/Debug/Plugin_MyGUI_OpenMW_Resources.dll" DESTINATION "." CONFIGURATIONS Debug)
@@ -455,7 +471,9 @@ if(WIN32)
         INSTALL(DIRECTORY "${OpenMW_BINARY_DIR}/Release/platforms" DESTINATION "." CONFIGURATIONS Release;RelWithDebInfo;MinSizeRel)
     ENDIF()
 
-    INSTALL(DIRECTORY "${OpenMW_BINARY_DIR}/resources" DESTINATION ".")
+    INSTALL(DIRECTORY "${OpenMW_BINARY_DIR}/Debug/resources" DESTINATION "." CONFIGURATIONS Debug)
+    INSTALL(DIRECTORY "${OpenMW_BINARY_DIR}/Release/resources" DESTINATION "." CONFIGURATIONS Release;RelWithDebInfo;MinSizeRel)
+    
     FILE(GLOB plugin_dir_debug "${OpenMW_BINARY_DIR}/Debug/osgPlugins-*")
     FILE(GLOB plugin_dir_release "${OpenMW_BINARY_DIR}/Release/osgPlugins-*")
     INSTALL(DIRECTORY ${plugin_dir_debug} DESTINATION "." CONFIGURATIONS Debug)
